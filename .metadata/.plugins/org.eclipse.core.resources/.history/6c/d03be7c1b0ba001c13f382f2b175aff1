@@ -1,0 +1,43 @@
+package com.apirest.consumer.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.apirest.consumer.model.Playlist;
+import com.apirest.consumer.service.ConsumerPlayListService;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+@RestController
+public class ConsumerPlayListController {
+	
+	@Autowired
+	private ConsumerPlayListService consumerPlayListService;
+	
+	@GetMapping("/playlist/{id}")
+	public Mono<Playlist> obterPlayList(@PathVariable String id){
+		
+		return consumerPlayListService.obterPorCodigo(id);
+		
+	}
+	
+	@GetMapping("/playlist")
+	  public Flux<Playlist> getPlaylist(){
+	  		
+	  		return consumerPlayListService.getPlaylist();
+	  	}
+	
+	
+	@GetMapping("/playlist/{id}/sincrono")
+	public ResponseEntity<Playlist> obterProdutoComPreco(@PathVariable String id) {
+		
+		Playlist playlist = this.consumerPlayListService.obterPorCodigoSincrono(id);
+
+		return ResponseEntity.ok(playlist);
+	}
+
+}

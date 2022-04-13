@@ -1,0 +1,8 @@
+package com.apirest.consumer.controller;
+
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class ConsumerPlayListController {
+
+}

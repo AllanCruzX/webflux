@@ -1,0 +1,1 @@
+spring.data.mongodb.uri=mongodb+srv://allan:abi300714@apirestwebflux.5wzds.mongodb.net/myFirstDatabase?retryWrites=true&w=majority

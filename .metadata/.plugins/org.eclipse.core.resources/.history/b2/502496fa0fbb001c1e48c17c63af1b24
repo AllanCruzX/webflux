@@ -1,0 +1,7 @@
+package com.apirest.controller;
+
+@RestController
+@RequestMapping("/tempos")
+public class TempoController {
+
+}

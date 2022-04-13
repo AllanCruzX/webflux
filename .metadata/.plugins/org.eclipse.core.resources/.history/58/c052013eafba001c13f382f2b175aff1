@@ -1,0 +1,78 @@
+package com.apirest.consumer.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.BodyInserters;
+
+import com.apirest.consumer.model.Playlist;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+@Service
+public class ConsumerPlayListService {
+	
+	@Autowired
+	private WebClient webClientPlayList;
+	
+	public Playlist obterPorCodigoSincrono(String id){
+		
+		Mono<Playlist> monoPlaylist = this.webClientPlayList
+				.method(HttpMethod.GET)
+				.uri("/playlist/{id}/sincrono", id)
+				.retrieve()
+				.bodyToMono(Playlist.class);
+		
+		Playlist playlist = monoPlaylist.block();
+		
+		return playlist;
+		
+	}
+	
+	
+  public Mono<Playlist> obterPorCodigo(String id){
+		
+	  Mono<Playlist> monoPlaylist = this.webClientPlayList
+				.method(HttpMethod.GET)
+				.uri("/playlist/{id}", id)
+				.retrieve()
+				.bodyToMono(Playlist.class);
+	  
+	  Mono<Playlist> playlist = Mono.zip(monoPlaylist, monoPlaylist).map(tuple -> {
+			tuple.getT1().setTempo(30);
+			return tuple.getT1();
+		});
+	  
+	  return playlist;
+		
+	}
+  
+  
+  public Flux<Playlist> getPlaylist(){
+  		
+  		return webClientPlayList
+				.method(HttpMethod.GET)
+				.uri("/playlist/")
+				.retrieve()
+				.bodyToFlux(Playlist.class);
+	  
+  	}
+  
+	public Playlist criar(Playlist playlist) {
+
+		Mono<Playlist> monoPlaylist = 
+				this.webClientPlayList
+					.post()
+					.uri("/playlist")
+					.body(BodyInserters.fromValue(playlist))
+					.retrieve()
+					.bodyToMono(Playlist.class);
+
+		return monoPlaylist.block();
+	}
+	
+	
+
+}

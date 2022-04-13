@@ -1,0 +1,123 @@
+package com.apirest.consumer.service;
+
+import java.util.concurrent.ExecutionException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import com.apirest.consumer.model.PlaylistComTempo;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+@Service
+public class ConsumerPlayListService {
+	
+	@Autowired
+	private WebClient webClientPlayList;
+	
+	@Autowired
+	private WebClient webClientTempo;
+	
+	public PlaylistComTempo obterPorCodigoSincrono(String id) throws InterruptedException, ExecutionException{
+		
+		Mono<PlaylistComTempo> monoPlaylist = this.webClientPlayList
+				.method(HttpMethod.GET)
+				.uri("/playlist/{id}/sincrono", id)
+				.retrieve()
+				.bodyToMono(PlaylistComTempo.class);
+		
+		PlaylistComTempo playlist = monoPlaylist.block();
+		
+		playlist.setTempo(120);
+		
+		return playlist;
+		
+	}
+	
+	
+//  public Mono<Playlist> obterPorCodigo(String id){
+//		
+//	  Mono<Playlist> monoPlaylist = this.webClientPlayList
+//				.method(HttpMethod.GET)
+//				.uri("/playlist/{id}", id)
+//				.retrieve()
+//				.bodyToMono(Playlist.class);
+//	  
+//	  Mono<Playlist> playlist = Mono.zip(monoPlaylist, monoPlaylist).map(tuple -> {
+//			tuple.getT1().setTempo(30);
+//			return tuple.getT1();
+//		});
+//	  
+//	  return playlist;
+//		
+//	}
+	
+	
+  public Mono<PlaylistComTempo> obterPorIdParlelo(String id){
+		
+	  Mono<PlaylistComTempo> monoPlaylist = this.webClientPlayList
+				.method(HttpMethod.GET)
+				.uri("/playlist/{id}", id)
+				.retrieve()
+				.bodyToMono(PlaylistComTempo.class);
+	  
+	  Mono<PlaylistComTempo> monoTempo = this.webClientTempo
+				.method(HttpMethod.GET)
+				.uri("/tempos/{id}", id)
+				.retrieve()
+				.bodyToMono(PlaylistComTempo.class);
+	  
+	  Mono<PlaylistComTempo> playlist = Mono.zip(monoPlaylist, monoPlaylist).map(tuple -> {
+			tuple.getT1().setTempo(30);
+			return tuple.getT1();
+		});
+	  
+	  return playlist;
+		
+	}
+  
+	public PlaylistComTempo obterPorCodigo(String id) {
+		
+		Mono<PlaylistComTempo> monoPlaylist = this.webClientPlayList
+				.method(HttpMethod.GET)
+				.uri("/playlist/{id}", id)
+				.retrieve()
+				.bodyToMono(PlaylistComTempo.class);
+		
+		PlaylistComTempo playlist = monoPlaylist.block();
+		
+		playlist.setTempo(120);
+		
+		return playlist;
+		
+	}
+  
+  
+  public Flux<PlaylistComTempo> getPlaylist(){
+  		
+  		return webClientPlayList
+				.method(HttpMethod.GET)
+				.uri("/playlist/")
+				.retrieve()
+				.bodyToFlux(PlaylistComTempo.class);
+	  
+  	}
+  
+	public Mono<PlaylistComTempo> criar(PlaylistComTempo playlist) {
+		
+		 return webClientPlayList
+					.post()
+					.uri("/playlist")
+					.body(BodyInserters.fromValue(playlist))
+					.retrieve()
+					.bodyToMono(PlaylistComTempo.class);
+		
+	}
+	
+	
+
+}

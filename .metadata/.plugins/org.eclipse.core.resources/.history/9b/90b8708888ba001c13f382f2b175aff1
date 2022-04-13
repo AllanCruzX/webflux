@@ -1,0 +1,6 @@
+package com.apirest.consumer.controller;
+
+@RestController
+public class ConsumerPlayListController {
+
+}

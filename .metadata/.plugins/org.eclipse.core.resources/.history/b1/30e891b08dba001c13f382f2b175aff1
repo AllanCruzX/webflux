@@ -1,0 +1,51 @@
+package com.apirest.consumer.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import com.apirest.consumer.model.Playlist;
+
+import reactor.core.publisher.Mono;
+
+@Service
+public class ConsumerPlayListService {
+	
+	@Autowired
+	private WebClient webClientPlayList;
+	
+	public Playlist obterPorCodigoSincrono(String id){
+		
+		Mono<Playlist> monoPlaylist = this.webClientPlayList
+				.method(HttpMethod.GET)
+				.uri("/playlist/{id}", id)
+				.retrieve()
+				.bodyToMono(Playlist.class);
+		
+		Playlist playlist = monoPlaylist.block();
+		
+		return playlist;
+		
+	}
+	
+	
+  public Mono<Playlist> obterPorCodigo(String id){
+		
+	  Mono<Playlist> monoPlaylist = this.webClientPlayList
+				.method(HttpMethod.GET)
+				.uri("/playlist/{id}", id)
+				.retrieve()
+				.bodyToMono(Playlist.class);
+	  
+	  Playlist playlist = monoPlaylist.block();
+	  
+	  playlist.setTempo(30);
+	  
+	  Mono<Playlist> monoPlaylistComTempo = playlist;
+		
+	}
+	
+	
+
+}

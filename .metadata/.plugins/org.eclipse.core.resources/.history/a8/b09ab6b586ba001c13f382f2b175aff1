@@ -1,0 +1,5 @@
+package com.apirest.consumer.model;
+
+public class Playlist {
+
+}

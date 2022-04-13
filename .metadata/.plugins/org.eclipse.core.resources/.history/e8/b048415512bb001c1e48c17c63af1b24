@@ -1,0 +1,61 @@
+package com.apirest.consumer.controller;
+
+import java.util.concurrent.ExecutionException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.apirest.consumer.model.PlaylistComTempo;
+import com.apirest.consumer.service.ConsumerPlayListService;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+@RestController
+public class ConsumerPlayListController {
+	
+	@Autowired
+	private ConsumerPlayListService consumerPlayListService;
+	
+//	@GetMapping("/playlist/{id}")
+//	public Mono<Playlist> obterPlayList(@PathVariable String id){
+//		
+//		return consumerPlayListService.obterPorCodigo(id);
+//		
+//	}
+	
+
+	@GetMapping("/playlist/{id}")
+	public ResponseEntity<PlaylistComTempo> obterProduto(@PathVariable String id)  {
+		
+		PlaylistComTempo playlist = this.consumerPlayListService.obterPorCodigo(id);
+
+		return ResponseEntity.ok(playlist);
+	}
+	
+	@GetMapping("/playlist")
+	  public Flux<PlaylistComTempo> getPlaylist(){
+	  		
+	  		return consumerPlayListService.getPlaylist();
+	  	}
+	
+	
+	@GetMapping("/playlist/{id}/sincrono")
+	public ResponseEntity<PlaylistComTempo> obterProdutoComPreco(@PathVariable String id) throws InterruptedException, ExecutionException {
+		
+		PlaylistComTempo playlist = this.consumerPlayListService.obterPorCodigoSincrono(id);
+
+		return ResponseEntity.ok(playlist);
+	}
+	
+	@PostMapping(value="/playlist")
+	public Mono<PlaylistComTempo> save(@RequestBody PlaylistComTempo playlist){
+		return consumerPlayListService.criar(playlist);
+	}
+
+}
